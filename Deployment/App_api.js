@@ -99,6 +99,7 @@ passport.use(new Strategy(
             return calling(null, safeUser);
 
         } catch (e) {
+            console.error("LOGIN_STRATEGY_ERROR:", e);
             return calling(e);
         }
     }
@@ -230,8 +231,10 @@ app.post("/api/regis", async (requ, resp) => {
         return resp.status(200).json({ user_e_mail: user_email });
 
     } catch (e) {
-        console.log(e);
-        return resp.status(500).json({ bad_gateway_err: "Internal server error." });
+        console.error("REGISTRATION_ERROR:", e);
+        return resp.status(500).json({
+            bad_gateway_err: e?.message || "Internal server error.",
+        });
     }
 });
 
