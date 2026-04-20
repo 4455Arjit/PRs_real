@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Yourself</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body class="bg-dark text-light">
+    <nav class="fixed-top bg-dark border-bottom border-danger mt-0 mb-2">
+            <div class="container d-flex justify-content-between p-2 text-white">
+                <a class=" btn btn-info rounded border border-danger bg-dark text-white me-2" href="/login">Get to LogIn Page</a>
+                <a class=" btn btn-info rounded border border-danger bg-dark text-white" href="/">Get to Landing Page</a>            
+            </div>
+        </nav>
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <form action="/regCredentials" method="post" class="p-4 border border-info rounded shadow-lg bg-dark">
+            <h3 class="text-center text-info rounded shadow-lg bg-dark">[ Register Yourself ]</h3>
+            <div class="mb-3">
+                <label class="form-label text-warning bg-dark" for="user_name">User-Email</label>
+                <input type="email" class="form-control bg-dark text-light border-info" name="user_email" id="user_name" required>
+            </div>
+            <div class="mb-3">    
+                <label class="form-label text-warning bg-" for="user_pass">User-Password</label>
+                <input class="form-control bg-dark text-light border-info" type="password" name="user_pass" id="user_pass" required>
+            </div>
+        <button class="btn btn-outline-danger w-100" type="submit">Register!</button>
+        <%if(locals.existing_error){%>
+            <h3 class="text-center text-warning border border-warning rounded mt-3"><%=existing_error%></h3>
+            <%}else if(locals.error_empty_columns){%>
+                <h3 class="text-center text-white bg-danger border border-warning rounded mt-3"><%=error_empty_columns%></h3>
+           <% }else{%>
+             <h3 class="text-center text-white bg-info border border-primary rounded mt-3"><%if(locals.bad_gateway){%><%=bad_gateway%><%}%></h3>
+             <%}%>
+    </form>
+</div>
+</body>
+</html>

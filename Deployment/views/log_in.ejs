@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+
+<body class="bg-dark text-white">
+    <nav class="fixed-top bg-dark border-bottom border-danger mt-0 mb-2">
+            <div class="container d-flex justify-content-between p-2 text-white">
+                <a class=" btn btn-info rounded border border-danger bg-dark text-white me-2" href="/">Get to Landing Page</a>
+                <a class=" btn btn-info rounded border border-danger bg-dark text-white" href="/regis">Get to Registration Page</a>            
+            </div>
+        </nav>
+    <div class="d-flex justify-content-center align-items-center vh-100">
+    <form action="/userLogin" method="post" class="border border-light rounded p-4 m-3">
+            <div class="mb-3">
+
+                <label for="user_name" class="form-label">User-Email</label>
+                <input type="email" class="form-control" name="user_email" id="user_name" <%if(locals.usermail){%>value="<%=usermail%>"<%}%> required>
+    
+            </div>
+            <div class="mb-3">
+                <label for="user_pass" class="form-label">User-Password</label>
+                <input type="password" class="form-control" name="user_pass" id="user_pass" required>
+            </div>
+
+            <div class="mt-4">
+                <button class="btn btn-primary w-100" type="submit">Log-In</button>
+                <% if(locals.pass_error){%>
+                    <h5 class="text-danger border border-danger rounded p-4 m-3"><%=pass_error%></h5>
+                    <%}else if(locals.not_exist_error){%>
+                        <h4 class="text-warning border border-warning rounded p-4 m-3"><%=not_exist_error%></h4>
+                        <%  }else if(locals.login_again_error){%>
+                            <h4 class="text-warning border border-warning rounded p-4 m-3"><%=login_again_error%></h4>
+                 <% } %>
+            </div>
+
+        </form>
+    </div>
+</body>
+
+</html>
