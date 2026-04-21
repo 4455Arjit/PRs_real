@@ -160,7 +160,7 @@ app.get("/api/public_posts", async (requ, resp) => {
             user_info.user_credits = update_points.rows[0].user_credits;
         }
 
-        const get_posts = await d_base.query("SELECT post_of_user FROM pub_info");
+        const get_posts = await d_base.query("SELECT user_name,post_of_user FROM pub_info");
 
         return resp.status(200).json({
             uusername_raw:    user_info,
