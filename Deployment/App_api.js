@@ -182,7 +182,7 @@ app.post("/api/post_creation", async (requ, resp) => {
         const user_info  = requ.user;
         const usr_name   = user_info.user_name;
         const raw_post   = requ.body["create_post"];
-        const user_post  = `${raw_post} :by-${usr_name}`;
+        const user_post  = `${raw_post}`;
 
         await d_base.query(
             "INSERT INTO pub_info(user_name, post_of_user) VALUES($1, $2)",
