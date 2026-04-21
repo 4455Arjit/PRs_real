@@ -3,64 +3,504 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Public News</title>
+    <title>Feed - Local Chat</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-dark text-light">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #21262d;
+            --border-color: #30363d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --accent-primary: #58a6ff;
+            --accent-secondary: #238636;
+            --accent-danger: #da3633;
+            --accent-warning: #d29922;
+            --accent-purple: #a371f7;
+            --accent-cyan: #39d353;
+        }
 
-    <div class="container d-flex flex-column align-items-center py-4 mt-4">
-        <nav class="fixed-top border-bottom border-danger mt-0 mb-2">
-            <div class="container d-flex justify-content-between p-2 text-white">
-                <h5 class="rounded border border-success bg-dark text-white">Hi , <%=uuser_name.user_name%></h5>
-                <div class="dropdown-group">
-                    <button class="btn btn-dark border border-danger btn-sm text-white dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Create +
-                    </button>
-                    <ul class="dropdown-menu bg-dark">
-                        <form class="dropdown-item bg-dark text-light" action="/creation" method="post">
-                            <input type="text" name="create_post" placeholder="CREATE POST" class="bg-dark text-info">
-                            <input type="submit" value="POST!">
-                        </form>
-                    </ul>
-                </div>
-                
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        ✦</button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item " href="/login">LogIn</a></li>
-                        <li><a class="dropdown-item " href="/regis">Register</a></li>
-                        <li><a class="dropdown-item " href="/">Home Page</a></li>
-                        <li><a class="dropdown-item" href="/logout">LogOut</a></li>
-                    </ul>
-                </div>
-                </div>
-        </nav>
-        <h2 class="mb-4 text-info">You have <%=user_points.user_credits%> Points</h2>
-        <%user_posts.forEach((post)=>{ %>
-            <div class="card bg-dark text-light border-info mb-3 shadow w-75">
-                <div class="card-body">
-                    <h4 class="card-text">
-                        <%=post.post_of_user%></h4>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Navbar */
+        .navbar-main {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .navbar-brand-icon {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-brand-text {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .nav-item-custom {
+            position: relative;
+        }
+
+        .points-badge {
+            background: linear-gradient(135deg, var(--accent-warning), #e3b341);
+            color: var(--bg-primary);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .user-greeting {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .user-name-highlight {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        /* Dropdown Styles */
+        .dropdown-toggle-modern {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-toggle-modern:hover {
+            background: var(--border-color);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        .dropdown-menu-modern {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.5rem;
+            min-width: 280px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .dropdown-menu-modern .dropdown-item {
+            color: var(--text-secondary);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .dropdown-menu-modern .dropdown-item:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        /* Create Post Form */
+        .create-post-form {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .create-post-input {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            width: 100%;
+            resize: none;
+            min-height: 60px;
+            transition: all 0.2s ease;
+        }
+
+        .create-post-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+        }
+
+        .create-post-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .btn-post {
+            background: linear-gradient(135deg, var(--accent-secondary), #2ea043);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 0.5rem 1.25rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-post:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(35, 134, 54, 0.3);
+        }
+
+        /* Feed Section */
+        .feed-container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem;
+        }
+
+        .feed-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .feed-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .feed-title i {
+            color: var(--accent-primary);
+        }
+
+        /* Post Cards */
+        .post-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .post-card:hover {
+            border-color: rgba(88, 166, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .post-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .post-meta {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .post-time {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .author-avatar {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-primary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Empty State */
+        .empty-feed {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .empty-feed-icon {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .empty-feed-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        .footer-main {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .footer-link:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .feed-container {
+                padding: 1rem;
+            }
+
+            .navbar-brand-text {
+                display: none;
+            }
+
+            .footer-content {
+                gap: 0.5rem;
+            }
+
+            .footer-link {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .post-card {
+                padding: 1rem;
+            }
+
+            .points-badge {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Navigation -->
+    <nav class="navbar-main">
+        <div class="container py-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <!-- Brand -->
+                <a href="/" class="navbar-brand">
+                    <span class="navbar-brand-icon"><i class="bi bi-chat-dots-fill"></i></span>
+                    <span class="navbar-brand-text">Local Chat</span>
+                </a>
+
+                <!-- Points & User Section -->
+                <div class="d-flex align-items-center gap-3">
+                    <div class="points-badge">
+                        <i class="bi bi-star-fill"></i>
+                        <span><%= user_points.user_credits %> Points</span>
+                    </div>
+
+                    <div class="user-greeting">
+                        Hi, <span class="user-name-highlight"><%= uuser_name.user_name %></span>
+                    </div>
+
+                    <!-- Create Dropdown -->
+                    <div class="dropdown">
+                        <button class="dropdown-toggle dropdown-toggle-modern" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-plus-circle"></i>
+                            Create
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-modern">
+                            <li>
+                                <form action="/creation" method="post" class="p-2">
+                                    <input type="text"
+                                           name="create_post"
+                                           class="create-post-input"
+                                           placeholder="What's on your mind?"
+                                           required>
+                                    <div class="mt-2 d-flex justify-content-end">
+                                        <button type="submit" class="btn-post">
+                                            <i class="bi bi-send"></i>
+                                            Post
+                                        </button>
+                                    </div>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- User Menu Dropdown -->
+                    <div class="dropdown">
+                        <button class="dropdown-toggle dropdown-toggle-modern" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i>
+                            Menu
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-modern">
+                            <li>
+                                <a class="dropdown-item" href="/login">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                    Sign In
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/regis">
+                                    <i class="bi bi-person-plus"></i>
+                                    Register
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/">
+                                    <i class="bi bi-house"></i>
+                                    Home
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider" style="border-color: var(--border-color);"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="/logout">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    Sign Out
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-                <% });%>
-                <footer class="mt-4">
-                    <div class="container">
-                        <div class="d-flex justify-content-between gap-4 p-2 fixed-bottom">
-                            <button class="btn btn-warning border-danger flex-fill">© Made by ARJIT</button>
-                            <a class="btn btn-light border-rounded border-warning text-warning flex-fill" href="https://github.com/4455Arjit/" target="_blank">My Github</a>
-                            <a class="btn btn-light border-rounded border-warning text-warning flex-fill" href="https://instagram.com/hehe_arjit/" target="_blank">My Instagram</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Feed Section -->
+    <div class="feed-container">
+        <div class="feed-header">
+            <h2 class="feed-title">
+                <i class="bi bi-newspaper"></i>
+                Community Feed
+            </h2>
+        </div>
+
+        <!-- Posts Loop -->
+        <% if(user_posts && user_posts.length > 0) { %>
+            <% user_posts.forEach((post, index) => { %>
+                <div class="post-card">
+                    <div class="post-content">
+                        <%= post.post_of_user %>
+                    </div>
+                    <div class="post-meta">
+                        <div class="post-author">
+                            <div class="author-avatar">
+                                <%= uuser_name.user_name.charAt(0).toUpperCase() %>
+                            </div>
+                            <span><%= uuser_name.user_name %></span>
+                        </div>
+                        <div class="post-time">
+                            <i class="bi bi-clock"></i>
+                            <span>Just now</span>
                         </div>
                     </div>
-                </footer>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <!-- Empty State -->
+            <div class="empty-feed">
+                <div class="empty-feed-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                <p class="empty-feed-text">No posts yet. Be the first to share something!</p>
             </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-    window.onload = function() {
-        // This calculates the height of the page and scrolls to the very bottom
-        window.scrollTo(0, document.body.scrollHeight);
-    };
-</script>        
+        <% } %>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-main">
+        <div class="container">
+            <div class="footer-content">
+                <a href="https://github.com/4455Arjit/" target="_blank" class="footer-link">
+                    <i class="bi bi-github"></i>
+                    GitHub
+                </a>
+                <a href="https://instagram.com/hehe_arjit/" target="_blank" class="footer-link">
+                    <i class="bi bi-instagram"></i>
+                    Instagram
+                </a>
+                <span class="footer-link">
+                    <i class="bi bi-heart-fill"></i>
+                    Made by ARJIT
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
